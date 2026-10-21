@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 import shutil
+import sys
 
 PROJECT = Path(__file__).resolve().parent.parent
 
@@ -11,7 +12,15 @@ PROJECT = Path(__file__).resolve().parent.parent
 def prepare(source, output, version):
     marker = json.loads((source / "pacote.json").read_text(encoding="utf-8"))
     entries = {entry["caminho"].replace("\\", "/"): entry for entry in marker["arquivos"]}
+    for relative in list(entries):
+        if "/" not in relative and relative.endswith(".ico"):
+            del entries[relative]
     overrides = {
+        "transcritor.py": PROJECT / "transcritor.py",
+        "integracao_windows.py": PROJECT / "integracao_windows.py",
+        "compatibilidade.py": PROJECT / "compatibilidade.py",
+        "diagnostico.py": PROJECT / "diagnostico.py",
+        "VERSAO.txt": PROJECT / "VERSAO.txt",
         "LEIA-ME.txt": PROJECT / "LEIA-ME.txt",
         "IMPLANTACAO.txt": PROJECT / "IMPLANTACAO.txt",
         "LICENCAS.txt": PROJECT / "LICENCAS.txt",
@@ -30,7 +39,11 @@ def prepare(source, output, version):
         else:
             shutil.copy2(path, destination)
     (output / "Abrir.cmd").write_text(
-        '@echo off\nstart "" "%~dp0runtime\\pythonw.exe" -B -X utf8 "%~dp0transcritor.py"\n', encoding="ascii")
+        '@echo off\nstart "Ditado" "%~dp0runtime\\pythonw.exe" -B -X utf8 "%~dp0transcritor.py"\n', encoding="ascii")
+    sys.path.insert(0, str(PROJECT))
+    from transcritor import DictationApp
+    DictationApp.tray_image("#116b61").save(
+        output / "ditado.ico", sizes=[(16, 16), (32, 32), (48, 48), (64, 64)])
     for path in output.rglob("*"):
         if path.is_file() and path.name != "pacote.json":
             relative = path.relative_to(output).as_posix()

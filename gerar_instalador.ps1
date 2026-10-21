@@ -4,9 +4,12 @@ $ErrorActionPreference = 'Stop'
 $project = $PSScriptRoot
 $version = (Get-Content -Raw -LiteralPath (Join-Path $project 'VERSAO.txt')).Trim()
 if (-not $OrigemAplicativo) {
-    $OrigemAplicativo = Join-Path $project ("distribuicao\WhisperDitado-$version\aplicativo")
+    $OrigemAplicativo = Join-Path $project ("distribuicao\Ditado-$version\aplicativo")
     if (-not (Test-Path -LiteralPath $OrigemAplicativo)) {
-        $OrigemAplicativo = Join-Path $project 'distribuicao\WhisperDitado-2.0.0\aplicativo'
+        $previous = Get-ChildItem -LiteralPath (Join-Path $project 'distribuicao') -Filter 'pacote.json' -Recurse -File |
+            Where-Object { $_.Directory.Name -eq 'aplicativo' } |
+            Sort-Object LastWriteTime -Descending | Select-Object -First 1
+        if ($previous) { $OrigemAplicativo = $previous.Directory.FullName }
     }
 }
 $payload = [IO.Path]::GetFullPath($OrigemAplicativo)

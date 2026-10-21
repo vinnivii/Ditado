@@ -1,4 +1,4 @@
-"""Janela local de ditado em português usando o Whisper oficial da OpenAI."""
+"""Ditado: gravação e transcrição local em português."""
 
 from __future__ import annotations
 
@@ -17,17 +17,19 @@ from tkinter import filedialog, messagebox, scrolledtext, ttk
 
 import numpy as np
 import sounddevice as sd
+from compatibilidade import migrate_preferences
 
 
 ROOT = Path(__file__).resolve().parent
 MODELS = ROOT / "modelos"
-DATA = Path(os.environ.get("LOCALAPPDATA", str(ROOT))) / "WhisperDitado"
+DATA = Path(os.environ.get("LOCALAPPDATA", str(ROOT))) / "Ditado"
 MODEL_OPTIONS = {"Mais rápido — base": "base", "Mais precisão — small": "small"}
 MAX_RECORDING_SECONDS = 600
 os.environ["PATH"] = str(ROOT / "bin") + os.pathsep + os.environ.get("PATH", "")
 
 
 def read_config():
+    migrate_preferences(DATA)
     try:
         data = json.loads((DATA / "config.json").read_text(encoding="utf-8"))
         return data if isinstance(data, dict) else {}
@@ -36,7 +38,7 @@ def read_config():
 
 
 def resample_audio(audio: np.ndarray, sample_rate: int) -> np.ndarray:
-    """Converte o áudio em memória para os 16 kHz esperados pelo Whisper."""
+    """Converte o áudio em memória para os 16 kHz esperados pelo modelo."""
     audio = np.ascontiguousarray(audio, dtype=np.float32).reshape(-1)
     if sample_rate == 16000:
         return audio
@@ -138,7 +140,7 @@ class DictationApp:
 
     def _build(self):
         window = self.window
-        window.title("Whisper • Ditado de ocorrências")
+        window.title("Ditado")
         window.geometry("960x790")
         window.minsize(840, 720)
         window.configure(bg="#f4f6f8")
@@ -222,7 +224,7 @@ class DictationApp:
     def setup_desktop(self):
         import pystray
         from integracao_windows import GlobalHotkey
-        self.tray = pystray.Icon("WhisperDitado", self.tray_image("#116b61"), "Whisper • Ctrl+Alt+Espaço",
+        self.tray = pystray.Icon("Ditado", self.tray_image("#116b61"), "Ditado • Ctrl+Alt+Espaço",
             menu=pystray.Menu(
                 pystray.MenuItem("Abrir painel", lambda icon, item: self.events.put(("show", None)), default=True),
                 pystray.MenuItem("Gravar / parar — Ctrl+Alt+Espaço", lambda icon, item: self.events.put(("toggle", None))),
@@ -255,7 +257,7 @@ class DictationApp:
     def notice(self, text):
         if self.tray:
             try:
-                self.tray.notify(text, "Whisper — Ditado")
+                self.tray.notify(text, "Ditado")
             except Exception:
                 logging.exception("Falha ao exibir notificação")
 
@@ -276,7 +278,7 @@ class DictationApp:
     def preload(self):
         self.busy = True
         self.set_controls()
-        self.status.set("Preparando o Whisper. Aguarde o aviso de que está pronto…")
+        self.status.set("Preparando o Ditado. Aguarde o aviso de que está pronto…")
         self.update_tray()
         model_name = MODEL_OPTIONS[self.model_name.get()]
         def worker():
@@ -294,7 +296,7 @@ class DictationApp:
         state, color = (("Gravando", "#c73333") if self.recording else
                         ("Processando", "#d18b13") if self.busy else ("Pronto", "#116b61"))
         self.tray.icon = self.tray_image(color)
-        self.tray.title = f"Whisper • {state} • Ctrl+Alt+Espaço"
+        self.tray.title = f"Ditado • {state} • Ctrl+Alt+Espaço"
 
     def refresh_microphones(self):
         try:
@@ -341,7 +343,7 @@ class DictationApp:
         elif not self.busy:
             self.start_recording()
         else:
-            self.notice("O Whisper está processando. Aguarde o aviso antes de gravar novamente.")
+            self.notice("O Ditado está processando. Aguarde o aviso antes de gravar novamente.")
         return "break"
 
     def start_recording(self):

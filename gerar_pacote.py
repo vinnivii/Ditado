@@ -9,7 +9,7 @@ import time
 
 ROOT = Path(__file__).resolve().parent
 VERSION = (ROOT / "VERSAO.txt").read_text(encoding="utf-8").strip()
-DESTINATION = ROOT / "distribuicao" / f"WhisperDitado-{VERSION}"
+DESTINATION = ROOT / "distribuicao" / f"Ditado-{VERSION}"
 PAYLOAD = DESTINATION / "aplicativo"
 
 
@@ -46,10 +46,10 @@ def main():
     shutil.copy2(ffmpeg_root / "bin" / "ffmpeg.exe", PAYLOAD / "bin" / "ffmpeg.exe")
     for name in ("LICENSE", "README.txt"):
         shutil.copy2(ffmpeg_root / name, PAYLOAD / "bin" / ("FFmpeg-" + name))
-    for name in ("transcritor.py", "integracao_windows.py", "diagnostico.py", "LEIA-ME.txt", "LICENCAS.txt"):
+    for name in ("transcritor.py", "integracao_windows.py", "compatibilidade.py", "diagnostico.py", "LEIA-ME.txt", "LICENCAS.txt"):
         shutil.copy2(ROOT / name, PAYLOAD / name)
     from transcritor import DictationApp
-    DictationApp.tray_image("#116b61").save(PAYLOAD / "whisper.ico", sizes=[(16, 16), (32, 32), (48, 48), (64, 64)])
+    DictationApp.tray_image("#116b61").save(PAYLOAD / "ditado.ico", sizes=[(16, 16), (32, 32), (48, 48), (64, 64)])
     shutil.copy2(ROOT / "IMPLANTACAO.txt", PAYLOAD / "IMPLANTACAO.txt")
     (PAYLOAD / "Abrir.cmd").write_text('@echo off\nstart "" "%~dp0runtime\\pythonw.exe" -B -X utf8 "%~dp0transcritor.py"\n', encoding="ascii")
     print("Calculando integridade do pacote...", flush=True)

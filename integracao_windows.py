@@ -2,6 +2,7 @@
 import ctypes
 from ctypes import wintypes
 import threading
+from compatibilidade import INSTANCE_NAMES
 
 user32 = ctypes.WinDLL("user32", use_last_error=True)
 kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
@@ -59,22 +60,37 @@ class GlobalHotkey:
 
 
 class SingleInstance:
-    def __init__(self):
-        self.mutex = kernel32.CreateMutexW(None, False, "Local\\WhisperDitadoV2")
-        if not self.mutex:
-            raise ctypes.WinError(ctypes.get_last_error())
-        self.already_running = ctypes.get_last_error() == 183
-        self.show_event = kernel32.CreateEventW(None, False, False, "Local\\WhisperDitadoV2Mostrar")
-        if not self.show_event:
-            kernel32.CloseHandle(self.mutex)
-            raise ctypes.WinError(ctypes.get_last_error())
+    def __init__(self, names=INSTANCE_NAMES):
+        self.mutexes = []
+        self.show_events = []
+        self.already_running = False
+        self.show_target = 0
+        try:
+            for index, name in enumerate(names):
+                mutex = kernel32.CreateMutexW(None, False, name)
+                if not mutex:
+                    raise ctypes.WinError(ctypes.get_last_error())
+                exists = ctypes.get_last_error() == 183
+                self.mutexes.append(mutex)
+                if exists and not self.already_running:
+                    self.show_target = index
+                self.already_running |= exists
+                event = kernel32.CreateEventW(None, False, False, name + "Mostrar")
+                if not event:
+                    raise ctypes.WinError(ctypes.get_last_error())
+                self.show_events.append(event)
+        except Exception:
+            self.close()
+            raise
 
     def request_show(self):
-        kernel32.SetEvent(self.show_event)
+        kernel32.SetEvent(self.show_events[self.show_target])
 
     def show_requested(self):
-        return kernel32.WaitForSingleObject(self.show_event, 0) == 0
+        return any(kernel32.WaitForSingleObject(event, 0) == 0 for event in self.show_events)
 
     def close(self):
-        kernel32.CloseHandle(self.show_event)
-        kernel32.CloseHandle(self.mutex)
+        for handle in self.show_events + self.mutexes:
+            kernel32.CloseHandle(handle)
+        self.show_events.clear()
+        self.mutexes.clear()

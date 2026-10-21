@@ -9,4 +9,4 @@ for name in ("base", "small"):
     model = whisper.load_model(name, device="cpu", download_root=str(directory))
     del model
     print(f"Modelo {name} pronto.", flush=True)
-print("Tudo pronto. Abra Whisper - Ditado de ocorrências.")
+print("Tudo pronto. Abra Ditado.")

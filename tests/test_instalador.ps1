@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param([string]$Instalador)
+param([string]$Instalador, [string]$InstaladorAnterior)
 $ErrorActionPreference = 'Stop'
 $project = [IO.Path]::GetFullPath((Split-Path -Parent $PSScriptRoot))
 $version = (Get-Content -Raw -LiteralPath (Join-Path $project 'VERSAO.txt')).Trim()
@@ -8,33 +8,50 @@ $uninstallKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{2CE8
 if (Test-Path -LiteralPath $uninstallKey) { throw 'Ja existe uma instalacao registrada. Execute este teste em um perfil sem Ditado 2.1 instalado.' }
 $sandbox = Join-Path $project ('verificacao\ciclo-instalador-' + [Guid]::NewGuid().ToString('N'))
 $target = Join-Path $sandbox 'aplicativo'
-$group = 'Whisper'
+$group = 'Ditado'
 $groupDir = Join-Path ([Environment]::GetFolderPath('Programs')) $group
-$desktopLink = Join-Path ([Environment]::GetFolderPath('Desktop')) 'Whisper - Ditado de ocorrencias.lnk'
-$startupLink = Join-Path ([Environment]::GetFolderPath('Startup')) 'Whisper - Ditado de ocorrencias.lnk'
-$menuLink = Join-Path $groupDir 'Whisper - Ditado de ocorrencias.lnk'
+$desktopLink = Join-Path ([Environment]::GetFolderPath('Desktop')) 'Ditado.lnk'
+$startupLink = Join-Path ([Environment]::GetFolderPath('Startup')) 'Ditado.lnk'
+$menuLink = Join-Path $groupDir 'Ditado.lnk'
 $removeLink = Join-Path $groupDir 'Desinstalar Ditado.lnk'
+$legacyGroup = Join-Path ([Environment]::GetFolderPath('Programs')) 'Whisper'
+$legacyLinks = @(
+    (Join-Path ([Environment]::GetFolderPath('Desktop')) 'Whisper - Ditado de ocorrencias.lnk'),
+    (Join-Path ([Environment]::GetFolderPath('Startup')) 'Whisper - Ditado de ocorrencias.lnk'),
+    (Join-Path $legacyGroup 'Whisper - Ditado de ocorrencias.lnk'),
+    (Join-Path $legacyGroup 'Desinstalar Ditado.lnk'))
 $originalLinks = @{}
-foreach ($path in @($desktopLink,$startupLink,$menuLink,$removeLink)) {
+foreach ($path in (@($desktopLink,$startupLink,$menuLink,$removeLink) + $legacyLinks)) {
     if (Test-Path -LiteralPath $path) { $originalLinks[$path] = [IO.File]::ReadAllBytes($path) }
     else { $originalLinks[$path] = $null }
 }
-$settings = Join-Path $env:LOCALAPPDATA 'WhisperDitado\config.json'
-$settingsHash = if (Test-Path -LiteralPath $settings) { (Get-FileHash -LiteralPath $settings).Hash } else { $null }
+$settingsHashes = @{}
+foreach ($folder in @('Ditado','WhisperDitado')) {
+    $path = Join-Path $env:LOCALAPPDATA ($folder + '\config.json')
+    $settingsHashes[$path] = if (Test-Path -LiteralPath $path) { (Get-FileHash -LiteralPath $path).Hash } else { $null }
+}
 New-Item -ItemType Directory -Path $sandbox -Force | Out-Null
 $shellLink = New-Object -ComObject WScript.Shell
 $fakeProcess = $null
 $success = $false
 
 function Assert-True([bool]$Condition,[string]$Message) { if (-not $Condition) { throw $Message } }
-function Run-Setup([string]$LogName,[string]$Tasks = '/TASKS="desktopicon,menuicon,startup"') {
+function Run-Setup([string]$LogName,[string]$Tasks = '/TASKS="desktopicon,menuicon,startup"',[string]$Binary = $Instalador) {
     $arguments = '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SEM_INICIAR /DIR="' + $target +
         '" /GROUP="' + $group + '" ' + $Tasks + ' /LOG="' + (Join-Path $sandbox $LogName) + '"'
-    $process = Start-Process -FilePath $Instalador -ArgumentList $arguments -WindowStyle Hidden -Wait -PassThru
+    $process = Start-Process -FilePath $Binary -ArgumentList $arguments -WindowStyle Hidden -Wait -PassThru
     return $process.ExitCode
 }
 
 try {
+    if ($InstaladorAnterior) {
+        Write-Host 'Preparando a versao anterior para validar a troca dos atalhos...'
+        $legacyCode = Run-Setup 'versao-anterior.log' '/TASKS="desktopicon,menuicon,startup"' $InstaladorAnterior
+        Assert-True ($legacyCode -eq 0) 'Falha ao preparar a versao anterior.'
+        foreach ($path in $legacyLinks) {
+            Assert-True (Test-Path -LiteralPath $path) ('Atalho anterior ausente: ' + $path)
+        }
+    }
     Write-Host '1/5 Instalando a copia de teste...'
     $installCode = Run-Setup 'instalacao.log'
     Assert-True ($installCode -eq 0) ("Falha na instalacao: $installCode")
@@ -54,6 +71,16 @@ try {
     Assert-True (Test-Path -LiteralPath (Join-Path $groupDir 'Desinstalar Ditado.lnk')) 'Atalho do desinstalador ausente.'
     $marker = Get-Content -Raw -LiteralPath (Join-Path $target 'pacote.json') | ConvertFrom-Json
     Assert-True ($marker.versao -eq $version -and $marker.produto -eq 'Ditado') 'Versao do payload incorreta.'
+    foreach ($name in @('transcritor.py','integracao_windows.py','compatibilidade.py')) {
+        $installedHash = (Get-FileHash -LiteralPath (Join-Path $target $name)).Hash
+        Assert-True ($installedHash -eq (Get-FileHash -LiteralPath (Join-Path $project $name)).Hash) ('Codigo desatualizado no instalador: ' + $name)
+    }
+    Assert-True (Test-Path -LiteralPath (Join-Path $target 'ditado.ico')) 'Icone com o nome Ditado ausente.'
+    if ($InstaladorAnterior) {
+        foreach ($path in $legacyLinks) {
+            Assert-True (-not (Test-Path -LiteralPath $path)) ('Atalho anterior nao removido: ' + $path)
+        }
+    }
 
     Write-Host '2/5 Testando bloqueio de instalacao e remocao enquanto o programa esta em uso...'
     $fakeArgs = '-B -c "import time; time.sleep(120)" "' + (Join-Path $target 'transcritor.py') + '"'
@@ -92,12 +119,16 @@ try {
     Assert-True (-not (Test-Path -LiteralPath $menuLink)) 'O atalho do Menu Iniciar permaneceu.'
     Assert-True (-not (Test-Path -LiteralPath $removeLink)) 'O atalho do desinstalador permaneceu.'
     Assert-True (Test-Path -LiteralPath $document) 'A desinstalacao removeu um documento do usuario.'
-    if ($settingsHash) { Assert-True ((Get-FileHash -LiteralPath $settings).Hash -eq $settingsHash) 'As preferencias foram alteradas.' }
+    foreach ($path in $settingsHashes.Keys) {
+        if ($settingsHashes[$path]) { Assert-True ((Get-FileHash -LiteralPath $path).Hash -eq $settingsHashes[$path]) 'As preferencias foram alteradas.' }
+        else { Assert-True (-not (Test-Path -LiteralPath $path)) 'O teste criou preferencias no perfil real.' }
+    }
     $report = @{ sucesso=$true; versao=$version; instalacao=$installCode; atualizacao=$upgradeCode;
         desinstalacao=$uninstallProcess.ExitCode; painel_de_controle=$registeredCommand;
         bloqueio_instalacao=$blockedInstallCode; bloqueio_desinstalacao=$blockedUninstall.ExitCode;
-        documentos_preservados=$true; preferencias_preservadas=$true; atalhos_removidos=$true }
-    $report | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $project 'verificacao\ciclo-instalador-2.1.0.json') -Encoding UTF8
+        documentos_preservados=$true; preferencias_preservadas=$true; atalhos_removidos=$true;
+        migracao_atalhos_anteriores=[bool]$InstaladorAnterior }
+    $report | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $project ("verificacao\ciclo-instalador-$version.json")) -Encoding UTF8
     $success = $true
     Write-Host '5/5 Ciclo de instalacao, atualizacao e desinstalacao validado.'
 } finally {

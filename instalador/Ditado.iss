@@ -1,5 +1,5 @@
 #ifndef AppVersion
-  #define AppVersion "2.1.0"
+  #define AppVersion "2.1.1"
 #endif
 
 [Setup]
@@ -11,8 +11,9 @@ AppPublisher=vinnivii
 AppPublisherURL=https://github.com/vinnivii/Ditado
 AppSupportURL=https://github.com/vinnivii/Ditado/issues
 AppUpdatesURL=https://github.com/vinnivii/Ditado/releases
-DefaultDirName={localappdata}\Programs\WhisperDitado
-DefaultGroupName=Whisper
+DefaultDirName={localappdata}\Programs\Ditado
+DefaultGroupName=Ditado
+UsePreviousGroup=no
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 ArchitecturesAllowed=x64compatible
@@ -20,8 +21,8 @@ ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0
 OutputDir={#OutputDir}
 OutputBaseFilename=Ditado-Setup-{#AppVersion}
-SetupIconFile={#PayloadDir}\whisper.ico
-UninstallDisplayIcon={app}\whisper.ico
+SetupIconFile={#MetadataDir}\ditado.ico
+UninstallDisplayIcon={app}\ditado.ico
 UninstallDisplayName=Ditado
 Uninstallable=yes
 UninstallLogMode=append
@@ -45,14 +46,14 @@ Name: "startup"; Description: "Iniciar o Ditado ao entrar no Windows"; GroupDesc
 
 [Files]
 Source: "{#ProjectDir}\instalador\verificar_em_uso.ps1"; Flags: dontcopy
-Source: "{#PayloadDir}\*"; DestDir: "{app}"; Excludes: "pacote.json,LEIA-ME.txt,LICENCAS.txt,Abrir.cmd,__pycache__,*.pyc"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#PayloadDir}\*"; DestDir: "{app}"; Excludes: "pacote.json,LEIA-ME.txt,LICENCAS.txt,Abrir.cmd,transcritor.py,integracao_windows.py,diagnostico.py,compatibilidade.py,whisper.ico,ditado.ico,__pycache__,*.pyc"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#MetadataDir}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\Whisper - Ditado de ocorrencias"; Filename: "{app}\runtime\pythonw.exe"; Parameters: "-B -X utf8 ""{app}\transcritor.py"""; WorkingDir: "{app}"; IconFilename: "{app}\whisper.ico"; Tasks: menuicon
-Name: "{group}\Desinstalar Ditado"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{app}\whisper.ico"; Tasks: menuicon
-Name: "{userdesktop}\Whisper - Ditado de ocorrencias"; Filename: "{app}\runtime\pythonw.exe"; Parameters: "-B -X utf8 ""{app}\transcritor.py"""; WorkingDir: "{app}"; IconFilename: "{app}\whisper.ico"; Tasks: desktopicon
-Name: "{userstartup}\Whisper - Ditado de ocorrencias"; Filename: "{app}\runtime\pythonw.exe"; Parameters: "-B -X utf8 ""{app}\transcritor.py"" --background"; WorkingDir: "{app}"; IconFilename: "{app}\whisper.ico"; Tasks: startup
+Name: "{group}\Ditado"; Filename: "{app}\runtime\pythonw.exe"; Parameters: "-B -X utf8 ""{app}\transcritor.py"""; WorkingDir: "{app}"; IconFilename: "{app}\ditado.ico"; Tasks: menuicon
+Name: "{group}\Desinstalar Ditado"; Filename: "{uninstallexe}"; WorkingDir: "{app}"; IconFilename: "{app}\ditado.ico"; Tasks: menuicon
+Name: "{userdesktop}\Ditado"; Filename: "{app}\runtime\pythonw.exe"; Parameters: "-B -X utf8 ""{app}\transcritor.py"""; WorkingDir: "{app}"; IconFilename: "{app}\ditado.ico"; Tasks: desktopicon
+Name: "{userstartup}\Ditado"; Filename: "{app}\runtime\pythonw.exe"; Parameters: "-B -X utf8 ""{app}\transcritor.py"" --background"; WorkingDir: "{app}"; IconFilename: "{app}\ditado.ico"; Tasks: startup
 
 [Run]
 Filename: "{app}\runtime\pythonw.exe"; Parameters: "-B -X utf8 ""{app}\transcritor.py"" --background"; WorkingDir: "{app}"; Description: "Iniciar o Ditado agora"; Flags: nowait postinstall skipifsilent; Check: StartAfterSetup
@@ -129,12 +130,18 @@ begin
       RaiseException('Não foi possível verificar o ambiente de transcrição.');
     if Code <> 0 then
       RaiseException('A verificação do ambiente falhou. Reinstale o Ditado.');
+    { Remover somente os atalhos antigos que pertencem a esta instalação. }
+    RemoveOwnedShortcut(ExpandConstant('{userstartup}\Whisper - Ditado de ocorrencias.lnk'));
+    RemoveOwnedShortcut(ExpandConstant('{userdesktop}\Whisper - Ditado de ocorrencias.lnk'));
+    RemoveOwnedShortcut(ExpandConstant('{userprograms}\Whisper\Whisper - Ditado de ocorrencias.lnk'));
+    RemoveOwnedShortcut(ExpandConstant('{userprograms}\Whisper\Desinstalar Ditado.lnk'));
+    RemoveDir(ExpandConstant('{userprograms}\Whisper'));
     if not WizardIsTaskSelected('startup') then
-      RemoveOwnedShortcut(ExpandConstant('{userstartup}\Whisper - Ditado de ocorrencias.lnk'));
+      RemoveOwnedShortcut(ExpandConstant('{userstartup}\Ditado.lnk'));
     if not WizardIsTaskSelected('desktopicon') then
-      RemoveOwnedShortcut(ExpandConstant('{userdesktop}\Whisper - Ditado de ocorrencias.lnk'));
+      RemoveOwnedShortcut(ExpandConstant('{userdesktop}\Ditado.lnk'));
     if not WizardIsTaskSelected('menuicon') then begin
-      RemoveOwnedShortcut(ExpandConstant('{group}\Whisper - Ditado de ocorrencias.lnk'));
+      RemoveOwnedShortcut(ExpandConstant('{group}\Ditado.lnk'));
       RemoveOwnedShortcut(ExpandConstant('{group}\Desinstalar Ditado.lnk'));
     end;
   end;

@@ -1,14 +1,14 @@
 # Ditado
 
-Ditado em português para Windows, com transcrição local usando o Whisper da OpenAI. Grave a partir de qualquer campo com **Ctrl+Alt+Espaço**, pare com o mesmo atalho e cole o texto com **Ctrl+V**.
+Ditado em português para Windows, com transcrição local baseada em modelos da OpenAI. Grave a partir de qualquer campo com **Ctrl+Alt+Espaço**, pare com o mesmo atalho e cole o texto com **Ctrl+V**.
 
 O aplicativo fica perto do relógio, inicia junto com o Windows e permite revisar os textos em um painel. O pacote de instalação inclui Python, FFmpeg e os modelos; depois de baixá-lo, a instalação e o uso funcionam sem internet, conta OpenAI ou chave de API.
 
 ## Baixar
 
-**[Baixar Ditado-Setup-2.1.0.exe](https://github.com/vinnivii/Ditado/releases/download/v2.1.0/Ditado-Setup-2.1.0.exe)** — instalador offline completo, com assistente em português e desinstalação pelo Windows.
+**[Baixar Ditado-Setup-2.1.1.exe](https://github.com/vinnivii/Ditado/releases/download/v2.1.1/Ditado-Setup-2.1.1.exe)** — instalador offline completo, com assistente em português e desinstalação pelo Windows.
 
-[Todas as versões](https://github.com/vinnivii/Ditado/releases) · [Arquivo SHA-256](https://github.com/vinnivii/Ditado/releases/download/v2.1.0/Ditado-Setup-2.1.0.exe.sha256)
+[Todas as versões](https://github.com/vinnivii/Ditado/releases) · [Arquivo SHA-256](https://github.com/vinnivii/Ditado/releases/download/v2.1.1/Ditado-Setup-2.1.1.exe.sha256)
 
 ## Requisitos
 
@@ -19,12 +19,12 @@ O aplicativo fica perto do relógio, inicia junto com o Windows e permite revisa
 
 ## Instalação passo a passo
 
-1. Baixe **Ditado-Setup-2.1.0.exe** pelo link acima.
+1. Baixe **Ditado-Setup-2.1.1.exe** pelo link acima.
 2. Se já estiver usando o Ditado, escolha **Sair** no menu do ícone perto do relógio.
 3. Dê dois cliques no instalador e siga o assistente em português.
 4. Escolha a pasta e os atalhos desejados. A inicialização com o Windows vem selecionada.
 5. Clique em **Instalar** e aguarde. Ao concluir, mantenha **Iniciar o Ditado agora** selecionado e clique em **Concluir**.
-6. Aguarde a notificação de que o Whisper está pronto. O ícone de microfone aparece perto do relógio, possivelmente dentro da seta de ícones ocultos.
+6. Aguarde a notificação de que o Ditado está pronto. O ícone de microfone aparece perto do relógio, possivelmente dentro da seta de ícones ocultos.
 
 O instalador registra **Ditado** no Painel de Controle e em Aplicativos Instalados. Também cria os atalhos escolhidos e um item **Desinstalar Ditado** no Menu Iniciar.
 
@@ -33,7 +33,7 @@ O instalador registra **Ditado** no Painel de Controle e em Aplicativos Instalad
 Abra o PowerShell na pasta do arquivo baixado e execute:
 
 ```powershell
-.\Ditado-Setup-2.1.0.exe
+.\Ditado-Setup-2.1.1.exe
 ```
 
 O único arquivo `.exe` inclui o ambiente completo. Os arquivos de código deste repositório servem para consultar e desenvolver o projeto.
@@ -72,7 +72,7 @@ Copie o instalador `.exe` para um pendrive ou compartilhamento de rede. Execute 
 Exemplo no PowerShell, a partir de um compartilhamento:
 
 ```powershell
-$instalacao = Start-Process -FilePath '\\servidor\programas\Ditado-Setup-2.1.0.exe' `
+$instalacao = Start-Process -FilePath '\\servidor\programas\Ditado-Setup-2.1.1.exe' `
   -ArgumentList '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART' -Wait -PassThru
 $instalacao.ExitCode
 ```
@@ -85,16 +85,18 @@ Substitua o caminho pelo compartilhamento da sua organização. A instalação s
 | `/SEM_INICIAR` | Dispensa a execução ao terminar a instalação interativa |
 | `/MERGETASKS="!startup"` | Desativa a inicialização automática |
 | `/MERGETASKS="!desktopicon,!menuicon"` | Dispensa atalhos de Área de Trabalho e Menu Iniciar |
-| `/DIR="D:\Apps\WhisperDitado"` | Define outra pasta de instalação |
+| `/DIR="D:\Apps\Ditado"` | Define outra pasta de instalação |
 | `/LOG="C:\Temp\ditado-instalacao.log"` | Registra detalhes da instalação |
 
-O caminho padrão é `%LOCALAPPDATA%\Programs\WhisperDitado`. O instalador confere os dados extraídos e verifica as dependências. O código de retorno **0** indica sucesso; outros valores indicam cancelamento ou erro. Consulte o log para detalhes.
+O caminho padrão para novas instalações é `%LOCALAPPDATA%\Programs\Ditado`. O instalador confere os dados extraídos e verifica as dependências. O código de retorno **0** indica sucesso; outros valores indicam cancelamento ou erro. Consulte o log para detalhes.
 
 Como a instalação é por usuário, executar o comando como `SYSTEM` instala para essa conta. Para ferramentas de gestão e scripts de logon, selecione o contexto do usuário. Consulte [IMPLANTACAO.txt](IMPLANTACAO.txt) para os detalhes.
 
 ### Atualizar
 
-Saia pelo menu do ícone perto do relógio e execute o novo instalador `.exe`. Ele reconhece a instalação anterior e preserva as preferências. A versão 2.0.0 também pode ser atualizada na mesma pasta; a entrada no Painel de Controle será criada pela nova instalação.
+Saia pelo menu do ícone perto do relógio e execute o novo instalador `.exe`. Ele reconhece a instalação registrada e mantém sua pasta, evitando duplicar o programa. Os atalhos passam a se chamar **Ditado**. Na primeira abertura, as preferências antigas são copiadas para `%LOCALAPPDATA%\Ditado`, sem substituir configurações já existentes.
+
+Para atualizar a versão 2.0.0, selecione a pasta onde ela já está instalada; a entrada no Painel de Controle será criada. Em instalações anteriores, o diretório do programa pode conservar o nome antigo para manter a atualização e a desinstalação funcionando.
 
 ## Solução de problemas
 
@@ -107,9 +109,9 @@ Saia pelo menu do ícone perto do relógio e execute o novo instalador `.exe`. E
 | Transcrição demorada | Use **Mais rápido — base** e dite trechos menores |
 | Sem aviso sonoro | Acompanhe a notificação e o estado do ícone; confira **Avisos sonoros** no painel |
 
-Preferências: `%LOCALAPPDATA%\WhisperDitado\config.json`.
+Preferências: `%LOCALAPPDATA%\Ditado\config.json`.
 
-Registro de erros: `%LOCALAPPDATA%\WhisperDitado\transcritor.log`.
+Registro de erros: `%LOCALAPPDATA%\Ditado\transcritor.log`.
 
 ## Processamento e arquivos
 
@@ -124,7 +126,7 @@ A transcrição é executada no computador. O aplicativo mantém o áudio do mic
 
 Também é possível usar **Configurações → Aplicativos → Aplicativos instalados → Ditado → Desinstalar**, ou **Desinstalar Ditado** no Menu Iniciar.
 
-As preferências em `%LOCALAPPDATA%\WhisperDitado` e os textos que você salvou são preservados. Para remover também as preferências, exclua essa pasta depois da desinstalação.
+As preferências em `%LOCALAPPDATA%\Ditado` e os textos que você salvou são preservados. Para remover também as preferências, exclua essa pasta depois da desinstalação. Os arquivos de preferências de versões anteriores também são mantidos.
 
 Para remoção silenciosa, execute na pasta de instalação:
 
@@ -138,6 +140,8 @@ O desinstalador nativo fica em `unins000.exe` nessa mesma pasta e aceita `/VERYS
 
 - `transcritor.py`: painel, gravação, transcrição, cópia automática e bandeja.
 - `integracao_windows.py`: atalho global e controle de instância única.
+- `compatibilidade.py`: migração de preferências e comunicação com versões anteriores.
+- `Abrir Ditado.cmd` e `Abrir Ditado.ps1`: abertura pelo local registrado no Windows ou pelo ambiente de desenvolvimento.
 - `instalador/Ditado.iss`: assistente, registro no Painel de Controle e desinstalador nativo.
 - `gerar_instalador.ps1`: compilação do instalador com Inno Setup 7.
 - `Instalar.cmd` e `Instalar.ps1`: execução do `.exe` com opções em português.
@@ -151,6 +155,8 @@ O ambiente de desenvolvimento usa Python 3.11, PyTorch para CPU e FFmpeg. `gerar
 
 ## Componentes de terceiros
 
-Whisper e os modelos são da [OpenAI](https://github.com/openai/whisper). O aplicativo também utiliza Python, PyTorch, SoundDevice, Pystray, Pillow, FFmpeg e bibliotecas de execução do Visual C++.
+O mecanismo de transcrição e os modelos são da [OpenAI](https://github.com/openai/whisper). O aplicativo também utiliza Python, PyTorch, SoundDevice, Pystray, Pillow, FFmpeg e bibliotecas de execução do Visual C++.
 
 Consulte [LICENCAS.txt](LICENCAS.txt) e mantenha os avisos e as licenças que acompanham o pacote ao redistribuí-lo.
+
+O nome apresentado pelo aplicativo é **Ditado**. Os nomes técnicos originais das dependências e os identificadores necessários para atualizar versões antigas são preservados no código e nos avisos de licença.

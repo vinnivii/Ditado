@@ -1,28 +1,29 @@
-DITADO 2.1.0 — INSTALADOR E DESINSTALADOR PARA WINDOWS
+DITADO 2.1.1 — INSTALADOR E DESINSTALADOR PARA WINDOWS
 
 DOWNLOAD
 https://github.com/vinnivii/Ditado/releases/latest
-Baixe Ditado-Setup-2.1.0.exe. O unico arquivo inclui Python, FFmpeg,
-dependencias, Whisper e os modelos base e small. A instalacao funciona offline.
+Baixe Ditado-Setup-2.1.1.exe. O unico arquivo inclui Python, FFmpeg,
+dependencias e os modelos base e small. A instalacao funciona offline.
 
 INSTALAR
 1. Saia do Ditado pelo icone perto do relogio, caso ja esteja usando.
-2. Dê dois cliques em Ditado-Setup-2.1.0.exe.
+2. Dê dois cliques em Ditado-Setup-2.1.1.exe.
 3. Siga o assistente em portugues e escolha pasta, atalhos e inicializacao.
 4. Clique em Instalar e aguarde. Ao concluir, pode iniciar o aplicativo.
 
 No PowerShell, dentro da pasta do arquivo baixado:
-    .\Ditado-Setup-2.1.0.exe
+    .\Ditado-Setup-2.1.1.exe
 
 O programa e registrado como Ditado no Painel de Controle e em Aplicativos
 Instalados. O desinstalador nativo unins000.exe fica na pasta de instalacao.
-O destino padrao continua sendo %LOCALAPPDATA%\Programs\WhisperDitado.
+O destino padrao para novas instalacoes e %LOCALAPPDATA%\Programs\Ditado.
+Os atalhos da Area de Trabalho, Menu Iniciar e inicializacao chamam-se Ditado.
 A instalacao e por usuario, sem solicitar administrador. Requer Windows 10/11
 de 64 bits e aproximadamente 3 GB livres. Validado no Windows 10.
 
 INSTALACAO SILENCIOSA EM MASSA
 No PowerShell:
-    $processo = Start-Process -FilePath '.\Ditado-Setup-2.1.0.exe' -ArgumentList '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART' -Wait -PassThru
+    $processo = Start-Process -FilePath '.\Ditado-Setup-2.1.1.exe' -ArgumentList '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART' -Wait -PassThru
     $processo.ExitCode
 
 Pode usar o caminho de um compartilhamento de rede no parametro -FilePath.
@@ -37,7 +38,7 @@ OPCOES DO EXE
     /SEM_INICIAR                             Nao abrir ao concluir o assistente.
     /MERGETASKS="!startup"                    Nao iniciar com o Windows.
     /MERGETASKS="!desktopicon,!menuicon"       Nao criar atalhos de Desktop e Menu.
-    /DIR="D:\Apps\WhisperDitado"              Usar outra pasta.
+    /DIR="D:\Apps\Ditado"                     Usar outra pasta.
     /LOG="C:\Temp\ditado-instalacao.log"      Registrar a instalacao em arquivo.
 
 As opcoes podem ser combinadas. A pasta escolhida deve ser exclusiva do Ditado.
@@ -47,7 +48,7 @@ Os wrappers Instalar.cmd e Instalar.ps1 do repositorio aceitam -Silencioso,
 DETECCAO PARA FERRAMENTAS DE GESTAO
 Chave de desinstalacao do usuario, na visao de 64 bits do Registro:
 HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\{2CE819B4-DA65-4668-AC70-47DE17CB5071}_is1
-DisplayName: Ditado. DisplayVersion: 2.1.0.
+DisplayName: Ditado. DisplayVersion: 2.1.1.
 O arquivo pacote.json na pasta do programa tambem informa a versao.
 
 DESINSTALAR PELO WINDOWS
@@ -57,7 +58,7 @@ Tambem pode usar Configuracoes > Aplicativos > Aplicativos instalados > Ditado.
 O Menu Iniciar inclui Desinstalar Ditado.
 
 A remocao exclui os arquivos instalados, os modelos, os atalhos e a inicializacao
-automatica. Preferencias e logs em %LOCALAPPDATA%\WhisperDitado sao preservados,
+automatica. Preferencias e logs em %LOCALAPPDATA%\Ditado sao preservados,
 assim como textos salvos pelo usuario. Caches de bytecode da instalacao sao limpos.
 O desinstalador impede a remocao se aquela copia do programa estiver aberta.
 
@@ -68,17 +69,20 @@ Ou inicie unins000.exe com /VERYSILENT /SUPPRESSMSGBOXES /NORESTART e aguarde
 o processo terminar na sua ferramenta de gestao.
 O UninstallString e o QuietUninstallString estao na chave de Registro acima.
 
-ATUALIZAR A VERSAO 2.0.0
-Saia do aplicativo e execute o novo EXE, mantendo a pasta atual. A instalacao
-2.1.0 passa a gerenciar o programa e registra o desinstalador no Windows.
-As preferencias existentes sao preservadas. Para futuras atualizacoes, o mesmo
-AppId reutiliza o registro e o historico de desinstalacao, sem duplicar entradas.
+ATUALIZAR VERSOES ANTERIORES
+Saia do aplicativo e execute o novo EXE. Uma instalacao registrada conserva sua
+pasta atual, mesmo se tiver o nome antigo. Para atualizar a versao 2.0.0, selecione
+a pasta onde ela ja esta instalada; o novo instalador registra a desinstalacao.
+Os atalhos antigos daquela instalacao sao substituidos por Ditado. Na primeira
+abertura, as preferencias antigas sao copiadas para %LOCALAPPDATA%\Ditado,
+sem substituir configuracoes ja existentes. Os arquivos antigos sao preservados.
+O mesmo AppId reutiliza o registro e o historico, sem duplicar entradas.
 
 USO
 Ctrl+Alt+Espaco: iniciar e parar a gravacao. Aguarde os dois sinais e cole com
 Ctrl+V. O painel permite revisar o texto, escolher o microfone e trocar o modelo.
 
 SUPORTE
-Preferencias e erros: %LOCALAPPDATA%\WhisperDitado.
+Preferencias e erros: %LOCALAPPDATA%\Ditado.
 Caso o microfone esteja bloqueado, permita o acesso para aplicativos da area
 de trabalho nas configuracoes de privacidade do Windows.
