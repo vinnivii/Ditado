@@ -58,8 +58,16 @@ SE NÃO FUNCIONAR
 * Demora: prefira Mais rápido — base e dite trechos menores.
 
 INSTALAR EM OUTROS COMPUTADORES
-Distribua o ZIP completo da pasta distribuicao. Extraia e execute Instalar.cmd.
-O guia IMPLANTACAO.txt explica o comando de instalação e suas opções.
+Baixe Ditado-Setup-2.1.0.exe em https://github.com/vinnivii/Ditado/releases/latest
+Dê dois cliques e siga o assistente em português. O programa será registrado
+como Ditado no Painel de Controle e em Aplicativos instalados.
+O guia IMPLANTACAO.txt explica a instalação silenciosa e suas opções.
+
+DESINSTALAR
+Saia pelo ícone perto do relógio. No Painel de Controle, abra Programas e
+Recursos, selecione Ditado e clique em Desinstalar. Também pode usar o item
+Desinstalar Ditado do Menu Iniciar. As preferências e os textos salvos ficam
+preservados. O instalador 2.1.0 pode atualizar a instalação 2.0.0 na mesma pasta.
 
 Código e modelos oficiais: https://github.com/openai/whisper
 Interface e integração com o Windows preparadas localmente neste projeto.

@@ -1,74 +1,84 @@
-WHISPER DITADO 2.0 — INSTALAÇÃO EM VÁRIOS COMPUTADORES
+DITADO 2.1.0 — INSTALADOR E DESINSTALADOR PARA WINDOWS
 
-O QUE DISTRIBUIR
-Use WhisperDitado-2.0.0.zip, na pasta distribuicao deste projeto. Extraia o ZIP
-inteiro em pasta local, pendrive ou compartilhamento de rede. Mantenha juntos
-Instalar.cmd, Instalar.ps1 e a pasta aplicativo.
-O pacote inclui Python, dependências, FFmpeg e modelos. A instalação não baixa
-nada da internet. Destino: Windows 10/11 de 64 bits, aproximadamente 3 GB livres.
-A validação foi feita no Windows 10 desta máquina.
+DOWNLOAD
+https://github.com/vinnivii/Ditado/releases/latest
+Baixe Ditado-Setup-2.1.0.exe. O unico arquivo inclui Python, FFmpeg,
+dependencias, Whisper e os modelos base e small. A instalacao funciona offline.
 
-UM COMANDO PARA INSTALAR
-No PowerShell, dentro da pasta extraída:
-    .\Instalar.cmd
+INSTALAR
+1. Saia do Ditado pelo icone perto do relogio, caso ja esteja usando.
+2. Dê dois cliques em Ditado-Setup-2.1.0.exe.
+3. Siga o assistente em portugues e escolha pasta, atalhos e inicializacao.
+4. Clique em Instalar e aguarde. Ao concluir, pode iniciar o aplicativo.
 
-Ou informe o caminho completo, inclusive a partir de um compartilhamento:
-    & '\\servidor\programas\WhisperDitado-2.0.0\Instalar.cmd'
+No PowerShell, dentro da pasta do arquivo baixado:
+    .\Ditado-Setup-2.1.0.exe
 
-Para instalar sem abrir o programa ao terminar:
-    .\Instalar.cmd -SemIniciar
+O programa e registrado como Ditado no Painel de Controle e em Aplicativos
+Instalados. O desinstalador nativo unins000.exe fica na pasta de instalacao.
+O destino padrao continua sendo %LOCALAPPDATA%\Programs\WhisperDitado.
+A instalacao e por usuario, sem solicitar administrador. Requer Windows 10/11
+de 64 bits e aproximadamente 3 GB livres. Validado no Windows 10.
 
-Equivalente direto em PowerShell:
-    powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Instalar.ps1 -SemIniciar
+INSTALACAO SILENCIOSA EM MASSA
+No PowerShell:
+    $processo = Start-Process -FilePath '.\Ditado-Setup-2.1.0.exe' -ArgumentList '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART' -Wait -PassThru
+    $processo.ExitCode
 
-O instalador retorna 0 em caso de sucesso; qualquer falha retorna 1. Verifica
-hashes SHA-256 e dependências antes de concluir. As preferências são preservadas
-nas atualizações. Se o aplicativo estiver aberto na instalação de destino,
-encerre pelo ícone da bandeja e execute o instalador novamente.
-Extraia antes: não execute de dentro do visualizador de ZIP.
+Pode usar o caminho de um compartilhamento de rede no parametro -FilePath.
+Execute no contexto do usuario que utilizara o ditado. Executar como SYSTEM
+instala e registra o programa para SYSTEM, nao para a pessoa.
+O aplicativo nao e aberto ao terminar uma instalacao silenciosa. Por padrao,
+fica configurado para iniciar ao entrar no Windows.
+Codigo de retorno 0: sucesso. Outros codigos: cancelamento ou erro; consulte o log.
 
-COMPORTAMENTO PADRÃO
-* Instala em %LOCALAPPDATA%\Programs\WhisperDitado, sem pedir administrador.
-* Cria atalhos na Área de Trabalho e no Menu Iniciar do usuário.
-* Inicia em segundo plano e configura execução ao entrar no Windows.
-* Não altera permissões do microfone nem a política permanente do PowerShell.
+OPCOES DO EXE
+    /VERYSILENT /SUPPRESSMSGBOXES /NORESTART    Instalacao silenciosa.
+    /SEM_INICIAR                             Nao abrir ao concluir o assistente.
+    /MERGETASKS="!startup"                    Nao iniciar com o Windows.
+    /MERGETASKS="!desktopicon,!menuicon"       Nao criar atalhos de Desktop e Menu.
+    /DIR="D:\Apps\WhisperDitado"              Usar outra pasta.
+    /LOG="C:\Temp\ditado-instalacao.log"      Registrar a instalacao em arquivo.
 
-OPÇÕES
-    -SemInicializacao    Não iniciar com o Windows.
-    -SemIniciar          Não abrir ao terminar.
-    -Destino 'D:\Apps\WhisperDitado'    Usar outra pasta de instalação.
-    -SemAtalhos          Não criar atalhos de Área de Trabalho e Menu Iniciar.
+As opcoes podem ser combinadas. A pasta escolhida deve ser exclusiva do Ditado.
+Os wrappers Instalar.cmd e Instalar.ps1 do repositorio aceitam -Silencioso,
+-SemIniciar, -SemInicializacao, -SemAtalhos, -Destino e -Log e chamam o mesmo EXE.
 
-GESTÃO EM MASSA
-Execute no contexto do usuário que usará o ditado. A instalação é por usuário;
-executar como SYSTEM instalará para SYSTEM, não para a pessoa.
-Pode ser acionado por script de logon, ferramenta de gestão ou manualmente.
-Evite reinstalar a cada logon: verifique se existe o arquivo
-%LOCALAPPDATA%\Programs\WhisperDitado\pacote.json e se sua versão é 2.0.0.
-Use sua ferramenta habitual para distribuir e executar esse comando. O pacote
-não dispara instalação remota por conta própria.
+DETECCAO PARA FERRAMENTAS DE GESTAO
+Chave de desinstalacao do usuario, na visao de 64 bits do Registro:
+HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\{2CE819B4-DA65-4668-AC70-47DE17CB5071}_is1
+DisplayName: Ditado. DisplayVersion: 2.1.0.
+O arquivo pacote.json na pasta do programa tambem informa a versao.
 
-COMO O PESSOAL USA
-1. Espere o aviso de que o Whisper está pronto.
-2. Clique no campo onde deseja inserir o texto.
-3. Pressione Ctrl+Alt+Espaço. Após o sinal, fale.
-4. Pressione Ctrl+Alt+Espaço novamente para parar.
-5. Aguarde os dois sinais de texto copiado e pressione Ctrl+V.
+DESINSTALAR PELO WINDOWS
+1. Saia pelo menu Sair do icone perto do relogio.
+2. Painel de Controle > Programas > Programas e Recursos > Ditado > Desinstalar.
+Tambem pode usar Configuracoes > Aplicativos > Aplicativos instalados > Ditado.
+O Menu Iniciar inclui Desinstalar Ditado.
 
-Cada novo ditado substitui a área de transferência, contendo apenas o último
-trecho. O painel guarda os ditados da sessão para revisão. O modelo base é o
-padrão para maior rapidez; o painel permite escolher small.
-Ícone perto do relógio: verde = pronto; vermelho = gravando; amarelo = processando.
-Botão direito no ícone abre o painel ou encerra. Fechar o painel mantém o atalho.
+A remocao exclui os arquivos instalados, os modelos, os atalhos e a inicializacao
+automatica. Preferencias e logs em %LOCALAPPDATA%\WhisperDitado sao preservados,
+assim como textos salvos pelo usuario. Caches de bytecode da instalacao sao limpos.
+O desinstalador impede a remocao se aquela copia do programa estiver aberta.
+
+DESINSTALACAO SILENCIOSA
+Na pasta de instalacao:
+    .\Desinstalar.cmd -Silencioso
+Ou inicie unins000.exe com /VERYSILENT /SUPPRESSMSGBOXES /NORESTART e aguarde
+o processo terminar na sua ferramenta de gestao.
+O UninstallString e o QuietUninstallString estao na chave de Registro acima.
+
+ATUALIZAR A VERSAO 2.0.0
+Saia do aplicativo e execute o novo EXE, mantendo a pasta atual. A instalacao
+2.1.0 passa a gerenciar o programa e registra o desinstalador no Windows.
+As preferencias existentes sao preservadas. Para futuras atualizacoes, o mesmo
+AppId reutiliza o registro e o historico de desinstalacao, sem duplicar entradas.
+
+USO
+Ctrl+Alt+Espaco: iniciar e parar a gravacao. Aguarde os dois sinais e cole com
+Ctrl+V. O painel permite revisar o texto, escolher o microfone e trocar o modelo.
 
 SUPORTE
-Preferências e erros: %LOCALAPPDATA%\WhisperDitado.
-O painel avisa se Ctrl+Alt+Espaço estiver ocupado por outro aplicativo.
-Se não houver som, acompanhe notificações e o ícone. Se o microfone estiver
-bloqueado, permita acesso para aplicativos da área de trabalho nas configurações
-de privacidade do Windows.
-
-DESINSTALAR
-Saia pelo ícone, remova a pasta de instalação e os atalhos Whisper - Ditado de
-ocorrencias da Área de Trabalho, Menu Iniciar e Inicializar. As preferências
-podem ser removidas em %LOCALAPPDATA%\WhisperDitado.
+Preferencias e erros: %LOCALAPPDATA%\WhisperDitado.
+Caso o microfone esteja bloqueado, permita o acesso para aplicativos da area
+de trabalho nas configuracoes de privacidade do Windows.

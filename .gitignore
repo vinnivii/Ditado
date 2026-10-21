@@ -11,3 +11,5 @@ distribuicao/
 *.zip
 *.zip.sha256
 *.lnk
+*.exe
+*.exe.sha256

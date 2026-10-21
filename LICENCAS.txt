@@ -19,3 +19,8 @@ https://ffmpeg.org/download.html
 
 Microsoft Visual C++: bibliotecas de execução redistribuíveis Microsoft.
 https://learn.microsoft.com/cpp/windows/redistributing-visual-cpp-files
+
+Instalador e desinstalador gerados com Inno Setup 7.1.0.
+Copyright (C) 1997-2026 Jordan Russell. Portions Copyright (C) 2000-2026 Martijn Laan.
+https://jrsoftware.org/
+https://jrsoftware.org/files/is/license.txt

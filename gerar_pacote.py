@@ -1,4 +1,4 @@
-"""Monta distribuição offline com Python portátil, dependências e modelos."""
+"""Prepara o payload offline para gerar_instalador.ps1."""
 import hashlib
 import json
 import os
@@ -6,10 +6,10 @@ from pathlib import Path
 import shutil
 import sys
 import time
-import zipfile
 
 ROOT = Path(__file__).resolve().parent
-DESTINATION = ROOT / "distribuicao" / "WhisperDitado-2.0.0"
+VERSION = (ROOT / "VERSAO.txt").read_text(encoding="utf-8").strip()
+DESTINATION = ROOT / "distribuicao" / f"WhisperDitado-{VERSION}"
 PAYLOAD = DESTINATION / "aplicativo"
 
 
@@ -50,23 +50,14 @@ def main():
         shutil.copy2(ROOT / name, PAYLOAD / name)
     from transcritor import DictationApp
     DictationApp.tray_image("#116b61").save(PAYLOAD / "whisper.ico", sizes=[(16, 16), (32, 32), (48, 48), (64, 64)])
-    for name in ("Instalar.cmd", "Instalar.ps1", "IMPLANTACAO.txt"):
-        text = (ROOT / name).read_text(encoding="utf-8-sig")
-        (DESTINATION / name).write_text(text, encoding="utf-8-sig" if name.endswith(".ps1") else "utf-8")
-    (PAYLOAD / "Abrir.cmd").write_text('@echo off\nstart "" "%~dp0runtime\\pythonw.exe" -X utf8 "%~dp0transcritor.py"\n', encoding="ascii")
+    shutil.copy2(ROOT / "IMPLANTACAO.txt", PAYLOAD / "IMPLANTACAO.txt")
+    (PAYLOAD / "Abrir.cmd").write_text('@echo off\nstart "" "%~dp0runtime\\pythonw.exe" -B -X utf8 "%~dp0transcritor.py"\n', encoding="ascii")
     print("Calculando integridade do pacote...", flush=True)
     files = [{"caminho": str(path.relative_to(PAYLOAD)), "sha256": digest(path)}
              for path in sorted(PAYLOAD.rglob("*")) if path.is_file() and path.name != "pacote.json"]
-    (PAYLOAD / "pacote.json").write_text(json.dumps({"versao": "2.0.0", "arquivos": files}, indent=2), encoding="utf-8")
-    print("Compactando para distribuicao...", flush=True)
-    archive_path = DESTINATION.parent / (DESTINATION.name + ".zip")
-    with zipfile.ZipFile(archive_path, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=1) as archive:
-        for path in sorted(DESTINATION.rglob("*")):
-            if path.is_file():
-                archive.write(path, path.relative_to(DESTINATION.parent))
-    checksum = digest(archive_path)
-    archive_path.with_suffix(".zip.sha256").write_text(f"{checksum}  {archive_path.name}\n", encoding="ascii")
-    print(f"Pronto: {archive_path} ({archive_path.stat().st_size / 1024**2:.0f} MB), {time.monotonic() - started:.0f} s", flush=True)
+    (PAYLOAD / "pacote.json").write_text(json.dumps({"produto": "Ditado", "versao": VERSION, "arquivos": files}, indent=2), encoding="utf-8")
+    print(f"Payload pronto: {PAYLOAD}, {time.monotonic() - started:.0f} s", flush=True)
+    print("Para criar o instalador com desinstalacao pelo Windows, execute gerar_instalador.ps1.", flush=True)
 
 
 if __name__ == "__main__":

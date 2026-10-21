@@ -6,9 +6,9 @@ O aplicativo fica perto do relógio, inicia junto com o Windows e permite revisa
 
 ## Baixar
 
-**[Baixar instalador offline — versão 2.0.0](https://github.com/vinnivii/Ditado/releases/download/v2.0.0/WhisperDitado-2.0.0.zip)** — aproximadamente 838 MB.
+**[Baixar Ditado-Setup-2.1.0.exe](https://github.com/vinnivii/Ditado/releases/download/v2.1.0/Ditado-Setup-2.1.0.exe)** — instalador offline completo, com assistente em português e desinstalação pelo Windows.
 
-[Todas as versões](https://github.com/vinnivii/Ditado/releases) · [Arquivo SHA-256](https://github.com/vinnivii/Ditado/releases/download/v2.0.0/WhisperDitado-2.0.0.zip.sha256)
+[Todas as versões](https://github.com/vinnivii/Ditado/releases) · [Arquivo SHA-256](https://github.com/vinnivii/Ditado/releases/download/v2.1.0/Ditado-Setup-2.1.0.exe.sha256)
 
 ## Requisitos
 
@@ -19,23 +19,24 @@ O aplicativo fica perto do relógio, inicia junto com o Windows e permite revisa
 
 ## Instalação passo a passo
 
-1. Baixe o arquivo **WhisperDitado-2.0.0.zip** pelo link acima.
-2. Clique com o botão direito no ZIP e escolha **Extrair Tudo**.
-3. Abra a pasta extraída que contém **Instalar.cmd**, **Instalar.ps1** e a pasta **aplicativo**. Mantenha esses itens juntos.
-4. Dê dois cliques em **Instalar.cmd**. Aguarde a cópia, a conferência dos arquivos e a mensagem de conclusão; essa etapa pode levar alguns minutos.
-5. Aguarde a notificação de que o Whisper está pronto. O ícone de microfone aparece perto do relógio, possivelmente dentro da seta de ícones ocultos.
+1. Baixe **Ditado-Setup-2.1.0.exe** pelo link acima.
+2. Se já estiver usando o Ditado, escolha **Sair** no menu do ícone perto do relógio.
+3. Dê dois cliques no instalador e siga o assistente em português.
+4. Escolha a pasta e os atalhos desejados. A inicialização com o Windows vem selecionada.
+5. Clique em **Instalar** e aguarde. Ao concluir, mantenha **Iniciar o Ditado agora** selecionado e clique em **Concluir**.
+6. Aguarde a notificação de que o Whisper está pronto. O ícone de microfone aparece perto do relógio, possivelmente dentro da seta de ícones ocultos.
 
-O instalador cria o atalho **Whisper - Ditado de ocorrencias** na Área de Trabalho e no Menu Iniciar e configura a execução automática ao entrar no Windows.
+O instalador registra **Ditado** no Painel de Controle e em Aplicativos Instalados. Também cria os atalhos escolhidos e um item **Desinstalar Ditado** no Menu Iniciar.
 
 ### Instalação com um comando
 
-Abra o PowerShell na pasta extraída que contém `Instalar.cmd` e execute:
+Abra o PowerShell na pasta do arquivo baixado e execute:
 
 ```powershell
-.\Instalar.cmd
+.\Ditado-Setup-2.1.0.exe
 ```
 
-O download em **Releases** contém o ambiente completo necessário ao instalador. Os arquivos de código deste repositório servem para consultar e desenvolver o projeto.
+O único arquivo `.exe` inclui o ambiente completo. Os arquivos de código deste repositório servem para consultar e desenvolver o projeto.
 
 ## Como usar
 
@@ -66,30 +67,34 @@ Dite em trechos de aproximadamente 30 a 60 segundos e revise nomes, números, da
 
 ## Instalação em vários computadores
 
-Copie a pasta extraída completa para um pendrive ou compartilhamento de rede. Execute o comando **no contexto do usuário que utilizará o aplicativo**.
+Copie o instalador `.exe` para um pendrive ou compartilhamento de rede. Execute **no contexto do usuário que utilizará o aplicativo**.
 
 Exemplo no PowerShell, a partir de um compartilhamento:
 
 ```powershell
-& '\\servidor\programas\WhisperDitado-2.0.0\Instalar.cmd' -SemIniciar
+$instalacao = Start-Process -FilePath '\\servidor\programas\Ditado-Setup-2.1.0.exe' `
+  -ArgumentList '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART' -Wait -PassThru
+$instalacao.ExitCode
 ```
 
-Substitua o caminho pelo compartilhamento da sua organização. A opção `-SemIniciar` instala e deixa o programa configurado para iniciar no próximo logon.
+Substitua o caminho pelo compartilhamento da sua organização. A instalação silenciosa deixa o programa configurado para o próximo logon, sem abri-lo ao terminar.
 
 | Opção | Efeito |
 | --- | --- |
-| `-SemIniciar` | Instala sem abrir o programa ao terminar |
-| `-SemInicializacao` | Desativa a inicialização automática desta instalação |
-| `-SemAtalhos` | Dispensa atalhos de Área de Trabalho e Menu Iniciar |
-| `-Destino 'D:\Apps\WhisperDitado'` | Define outra pasta de instalação |
+| `/VERYSILENT /SUPPRESSMSGBOXES /NORESTART` | Instala sem janelas e sem reiniciar o Windows |
+| `/SEM_INICIAR` | Dispensa a execução ao terminar a instalação interativa |
+| `/MERGETASKS="!startup"` | Desativa a inicialização automática |
+| `/MERGETASKS="!desktopicon,!menuicon"` | Dispensa atalhos de Área de Trabalho e Menu Iniciar |
+| `/DIR="D:\Apps\WhisperDitado"` | Define outra pasta de instalação |
+| `/LOG="C:\Temp\ditado-instalacao.log"` | Registra detalhes da instalação |
 
-O caminho padrão é `%LOCALAPPDATA%\Programs\WhisperDitado`. O instalador retorna **0** em caso de sucesso e **1** em caso de falha. Ele verifica os hashes SHA-256 e as dependências antes de concluir.
+O caminho padrão é `%LOCALAPPDATA%\Programs\WhisperDitado`. O instalador confere os dados extraídos e verifica as dependências. O código de retorno **0** indica sucesso; outros valores indicam cancelamento ou erro. Consulte o log para detalhes.
 
 Como a instalação é por usuário, executar o comando como `SYSTEM` instala para essa conta. Para ferramentas de gestão e scripts de logon, selecione o contexto do usuário. Consulte [IMPLANTACAO.txt](IMPLANTACAO.txt) para os detalhes.
 
 ### Atualizar
 
-Saia pelo menu do ícone perto do relógio, extraia o novo pacote e execute `Instalar.cmd` novamente. As preferências são preservadas. O instalador avisa se a instalação de destino ainda estiver em uso.
+Saia pelo menu do ícone perto do relógio e execute o novo instalador `.exe`. Ele reconhece a instalação anterior e preserva as preferências. A versão 2.0.0 também pode ser atualizada na mesma pasta; a entrada no Painel de Controle será criada pela nova instalação.
 
 ## Solução de problemas
 
@@ -113,21 +118,36 @@ A transcrição é executada no computador. O aplicativo mantém o áudio do mic
 ## Desinstalar
 
 1. Encerre pelo menu **Sair** do ícone perto do relógio.
-2. Remova a pasta `%LOCALAPPDATA%\Programs\WhisperDitado`, ou o destino personalizado escolhido.
-3. Remova os atalhos **Whisper - Ditado de ocorrencias** da Área de Trabalho, do Menu Iniciar e da pasta Inicializar. Para abrir esta última, pressione `Win+R` e execute `shell:startup`.
-4. Se desejar remover também as preferências e os logs, exclua `%LOCALAPPDATA%\WhisperDitado`.
+2. Abra **Painel de Controle → Programas → Programas e Recursos**.
+3. Selecione **Ditado** e clique em **Desinstalar**.
+4. Confirme a remoção. O desinstalador remove o aplicativo, os modelos, os atalhos e a inicialização automática.
+
+Também é possível usar **Configurações → Aplicativos → Aplicativos instalados → Ditado → Desinstalar**, ou **Desinstalar Ditado** no Menu Iniciar.
+
+As preferências em `%LOCALAPPDATA%\WhisperDitado` e os textos que você salvou são preservados. Para remover também as preferências, exclua essa pasta depois da desinstalação.
+
+Para remoção silenciosa, execute na pasta de instalação:
+
+```powershell
+.\Desinstalar.cmd -Silencioso
+```
+
+O desinstalador nativo fica em `unins000.exe` nessa mesma pasta e aceita `/VERYSILENT /SUPPRESSMSGBOXES /NORESTART`.
 
 ## Organização do código
 
 - `transcritor.py`: painel, gravação, transcrição, cópia automática e bandeja.
 - `integracao_windows.py`: atalho global e controle de instância única.
-- `Instalar.cmd` e `Instalar.ps1`: instalação por usuário e criação dos atalhos.
+- `instalador/Ditado.iss`: assistente, registro no Painel de Controle e desinstalador nativo.
+- `gerar_instalador.ps1`: compilação do instalador com Inno Setup 7.
+- `Instalar.cmd` e `Instalar.ps1`: execução do `.exe` com opções em português.
+- `Desinstalar.cmd` e `Desinstalar.ps1`: execução do desinstalador registrado no Windows.
 - `diagnostico.py`: verificação das dependências e dos modelos.
 - `preparar_modelos.py`: download inicial dos modelos para desenvolvimento.
 - `gerar_pacote.py`: montagem do pacote offline em Windows, a partir do ambiente de desenvolvimento preparado.
 - `requirements-instalados.txt`: versões das dependências usadas nesta distribuição.
 
-O ambiente de desenvolvimento usa Python 3.11, PyTorch para CPU e FFmpeg. O gerador do pacote utiliza o Python da sessão, as dependências do ambiente virtual, a pasta `modelos` e o FFmpeg instalado via Chocolatey. Os modelos, o runtime, os logs e os pacotes de distribuição ficam fora do histórico Git; o instalador completo está em **Releases**.
+O ambiente de desenvolvimento usa Python 3.11, PyTorch para CPU e FFmpeg. `gerar_pacote.py` prepara o runtime portátil com as dependências e os modelos. Depois, execute `gerar_instalador.ps1` com o Inno Setup 7 instalado, ou informe `-Compilador 'C:\caminho\ISCC.exe'`. O parâmetro `-OrigemAplicativo` permite reutilizar um payload já preparado. Os binários e modelos ficam fora do Git; o instalador completo está em **Releases**.
 
 ## Componentes de terceiros
 
