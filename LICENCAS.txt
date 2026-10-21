@@ -1,0 +1,21 @@
+COMPONENTES DE TERCEIROS
+
+A interface é código local deste projeto. Componentes de terceiros mantêm suas
+licenças. Os avisos acompanham o Python e os diretórios *.dist-info dentro de
+runtime\Lib\site-packages. Preserve-os ao redistribuir o pacote.
+
+Whisper e modelos: OpenAI, MIT.
+https://github.com/openai/whisper/blob/main/LICENSE
+Python: Python Software Foundation. Consulte também runtime\LICENSE.txt.
+https://docs.python.org/3/license.html
+PyTorch: BSD e componentes indicados no próprio pacote.
+https://github.com/pytorch/pytorch/blob/main/LICENSE
+SoundDevice: MIT. Pystray: LGPLv3. Pillow: HPND.
+
+FFmpeg: preservados bin\FFmpeg-LICENSE e bin\FFmpeg-README.txt do distribuidor.
+Binário 8.1 essentials obtido via Chocolatey/Gyan. Fontes e compilação:
+https://www.gyan.dev/ffmpeg/builds/
+https://ffmpeg.org/download.html
+
+Microsoft Visual C++: bibliotecas de execução redistribuíveis Microsoft.
+https://learn.microsoft.com/cpp/windows/redistributing-visual-cpp-files

@@ -1,0 +1,65 @@
+﻿WHISPER — DITADO COM ATALHO GLOBAL
+
+PARA USAR NO DIA A DIA
+1. Aguarde o aviso de que o Whisper está pronto.
+2. Clique no campo da ocorrência, documento ou mensagem.
+3. Pressione Ctrl+Alt+Espaço. Após o sinal, comece a falar.
+4. Pressione Ctrl+Alt+Espaço novamente para parar a gravação.
+5. Aguarde os dois sinais e o aviso Texto copiado. Pressione Ctrl+V para colar.
+
+Você não precisa abrir o painel nem sair do campo para gravar e parar.
+A transcrição ocorre depois que você encerra a gravação. O aplicativo não
+preenche nem envia a ocorrência automaticamente. Você decide onde colar o texto.
+Cada ditado substitui a área de transferência com apenas o trecho mais recente.
+Cole antes de começar o próximo. Em caso de silêncio ou erro de transcrição,
+o aplicativo não copia um resultado vazio.
+
+PAINEL E ÍCONE PERTO DO RELÓGIO
+O atalho Whisper - Ditado de ocorrencias abre o painel. Também pode clicar com
+o botão direito no ícone de microfone perto do relógio e escolher Abrir painel.
+Verde: pronto. Vermelho: gravando. Amarelo: preparando ou transcrevendo.
+O Windows pode colocar o ícone dentro da seta de ícones ocultos perto do relógio.
+Fechar o painel mantém o aplicativo funcionando. Para encerrar de verdade,
+use Sair no menu do ícone. Abrir o atalho novamente reaproveita a instância.
+
+No painel você pode:
+* Escolher outro microfone e clicar em Atualizar ao conectar um fone.
+* Rever e editar os ditados da sessão, copiar todo o texto ou salvar um .txt.
+* Desligar a cópia automática ou os sinais sonoros.
+* Trocar entre Mais rápido — base e Mais precisão — small.
+* Transcrever arquivos de áudio, como MP3, M4A ou WAV.
+
+Os ditados da sessão aparecem juntos no painel. A cópia automática contém
+somente o último trecho; o botão Copiar texto copia tudo o que estiver no painel.
+O F8 continua funcionando para gravar e parar quando o painel está em foco.
+
+PARA RELATOS MAIS COMPLETOS
+Fale em blocos de aproximadamente 30 a 60 segundos. Relate quando e onde
+aconteceu, quem estava envolvido, a sequência dos fatos e as providências tomadas.
+Inclua somente fatos conhecidos. Revise nomes, números, placas, datas e endereços.
+O Whisper transcreve sua fala, sem completar informações ausentes.
+
+FUNCIONAMENTO LOCAL
+Após instalar o pacote, não é necessário ter internet, conta OpenAI ou chave de
+API. A transcrição é feita no computador e não há cobrança por minuto.
+O áudio do microfone fica na memória durante o processamento e não é salvo pelo
+aplicativo. O texto da sessão só é salvo em arquivo quando você solicita.
+Preferências: %LOCALAPPDATA%\WhisperDitado\config.json.
+Registro de erros: %LOCALAPPDATA%\WhisperDitado\transcritor.log.
+A gravação tem limite de 10 minutos por trecho; depois, é transcrita automaticamente.
+
+SE NÃO FUNCIONAR
+* Atalho sem resposta: aguarde preparar o modelo ou abra pelo atalho da Área de Trabalho.
+* Atalho em conflito: o painel avisa se Ctrl+Alt+Espaço está ocupado. Feche o outro
+  aplicativo em conflito ou use os botões do painel.
+* Sem movimento na barra: confira o microfone e o volume de entrada no painel.
+* Microfone bloqueado: permita acesso para aplicativos da área de trabalho em
+  Configurações > Privacidade > Microfone.
+* Demora: prefira Mais rápido — base e dite trechos menores.
+
+INSTALAR EM OUTROS COMPUTADORES
+Distribua o ZIP completo da pasta distribuicao. Extraia e execute Instalar.cmd.
+O guia IMPLANTACAO.txt explica o comando de instalação e suas opções.
+
+Código e modelos oficiais: https://github.com/openai/whisper
+Interface e integração com o Windows preparadas localmente neste projeto.

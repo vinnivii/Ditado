@@ -1,0 +1,13 @@
+.venv/
+modelos/
+__pycache__/
+*.log
+verificacao/
+distribuicao/
+.env
+.env.*
+!.env.example
+*.pt
+*.zip
+*.zip.sha256
+*.lnk

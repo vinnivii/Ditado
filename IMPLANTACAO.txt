@@ -1,0 +1,74 @@
+WHISPER DITADO 2.0 — INSTALAÇÃO EM VÁRIOS COMPUTADORES
+
+O QUE DISTRIBUIR
+Use WhisperDitado-2.0.0.zip, na pasta distribuicao deste projeto. Extraia o ZIP
+inteiro em pasta local, pendrive ou compartilhamento de rede. Mantenha juntos
+Instalar.cmd, Instalar.ps1 e a pasta aplicativo.
+O pacote inclui Python, dependências, FFmpeg e modelos. A instalação não baixa
+nada da internet. Destino: Windows 10/11 de 64 bits, aproximadamente 3 GB livres.
+A validação foi feita no Windows 10 desta máquina.
+
+UM COMANDO PARA INSTALAR
+No PowerShell, dentro da pasta extraída:
+    .\Instalar.cmd
+
+Ou informe o caminho completo, inclusive a partir de um compartilhamento:
+    & '\\servidor\programas\WhisperDitado-2.0.0\Instalar.cmd'
+
+Para instalar sem abrir o programa ao terminar:
+    .\Instalar.cmd -SemIniciar
+
+Equivalente direto em PowerShell:
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Instalar.ps1 -SemIniciar
+
+O instalador retorna 0 em caso de sucesso; qualquer falha retorna 1. Verifica
+hashes SHA-256 e dependências antes de concluir. As preferências são preservadas
+nas atualizações. Se o aplicativo estiver aberto na instalação de destino,
+encerre pelo ícone da bandeja e execute o instalador novamente.
+Extraia antes: não execute de dentro do visualizador de ZIP.
+
+COMPORTAMENTO PADRÃO
+* Instala em %LOCALAPPDATA%\Programs\WhisperDitado, sem pedir administrador.
+* Cria atalhos na Área de Trabalho e no Menu Iniciar do usuário.
+* Inicia em segundo plano e configura execução ao entrar no Windows.
+* Não altera permissões do microfone nem a política permanente do PowerShell.
+
+OPÇÕES
+    -SemInicializacao    Não iniciar com o Windows.
+    -SemIniciar          Não abrir ao terminar.
+    -Destino 'D:\Apps\WhisperDitado'    Usar outra pasta de instalação.
+    -SemAtalhos          Não criar atalhos de Área de Trabalho e Menu Iniciar.
+
+GESTÃO EM MASSA
+Execute no contexto do usuário que usará o ditado. A instalação é por usuário;
+executar como SYSTEM instalará para SYSTEM, não para a pessoa.
+Pode ser acionado por script de logon, ferramenta de gestão ou manualmente.
+Evite reinstalar a cada logon: verifique se existe o arquivo
+%LOCALAPPDATA%\Programs\WhisperDitado\pacote.json e se sua versão é 2.0.0.
+Use sua ferramenta habitual para distribuir e executar esse comando. O pacote
+não dispara instalação remota por conta própria.
+
+COMO O PESSOAL USA
+1. Espere o aviso de que o Whisper está pronto.
+2. Clique no campo onde deseja inserir o texto.
+3. Pressione Ctrl+Alt+Espaço. Após o sinal, fale.
+4. Pressione Ctrl+Alt+Espaço novamente para parar.
+5. Aguarde os dois sinais de texto copiado e pressione Ctrl+V.
+
+Cada novo ditado substitui a área de transferência, contendo apenas o último
+trecho. O painel guarda os ditados da sessão para revisão. O modelo base é o
+padrão para maior rapidez; o painel permite escolher small.
+Ícone perto do relógio: verde = pronto; vermelho = gravando; amarelo = processando.
+Botão direito no ícone abre o painel ou encerra. Fechar o painel mantém o atalho.
+
+SUPORTE
+Preferências e erros: %LOCALAPPDATA%\WhisperDitado.
+O painel avisa se Ctrl+Alt+Espaço estiver ocupado por outro aplicativo.
+Se não houver som, acompanhe notificações e o ícone. Se o microfone estiver
+bloqueado, permita acesso para aplicativos da área de trabalho nas configurações
+de privacidade do Windows.
+
+DESINSTALAR
+Saia pelo ícone, remova a pasta de instalação e os atalhos Whisper - Ditado de
+ocorrencias da Área de Trabalho, Menu Iniciar e Inicializar. As preferências
+podem ser removidas em %LOCALAPPDATA%\WhisperDitado.
